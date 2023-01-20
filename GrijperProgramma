@@ -1,8 +1,8 @@
 #define stepPin 2
 #define dirPin 3
 #define Button 8
-#define ButtonL 7
-#define ButtonR 6
+#define ButtonLinks 7
+#define ButtonRechts 6
 #define LedRood 5
 #define LedGroen 4
 
@@ -14,8 +14,8 @@ void setup() {
   pinMode(Button, INPUT);
   pinMode(LedRood, OUTPUT);
   pinMode(LedGroen, OUTPUT); 
-  pinMode(ButtonL, INPUT);
-  pinMode(ButtonR, INPUT);
+  pinMode(ButtonLinks, INPUT);
+  pinMode(ButtonRechts, INPUT);
   
   digitalWrite(dirPin, HIGH);
 }
@@ -34,7 +34,7 @@ void foutmelding() {
     delay(100);
   }
   
-  while(digitalRead(ButtonL) == false){
+  while(digitalRead(ButtonLinks) == false){
     digitalWrite(LedRood, HIGH);
     digitalWrite(dirPin, HIGH);  
     digitalWrite(stepPin, HIGH);
@@ -60,7 +60,7 @@ void loop(){
     grijpTijd = millis(); 
 
     //onkruid grijpen 
-    while(digitalRead(ButtonR) == false){
+    while(digitalRead(ButtonRechts) == false){
       digitalWrite(dirPin, LOW);  
       digitalWrite(stepPin, HIGH);
       delayMicroseconds(600);       //snelheid in te stellen
@@ -86,7 +86,7 @@ void loop(){
       losTijd = millis();
       
       //onkruid loslaten
-      while(digitalRead(ButtonL) == false) {
+      while(digitalRead(ButtonLinks) == false) {
         digitalWrite(dirPin, HIGH);  
         digitalWrite(stepPin, HIGH);
         delayMicroseconds(600);     //snelheid in te stellen
