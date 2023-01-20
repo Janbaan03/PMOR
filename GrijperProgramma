@@ -1,0 +1,111 @@
+#define stepPin 2
+#define dirPin 3
+#define Button 8
+#define ButtonL 7
+#define ButtonR 6
+#define LedRood 5
+#define LedGroen 4
+
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(stepPin, OUTPUT);
+  pinMode(dirPin, OUTPUT);
+  pinMode(Button, INPUT);
+  pinMode(LedRood, OUTPUT);
+  pinMode(LedGroen, OUTPUT); 
+  pinMode(ButtonL, INPUT);
+  pinMode(ButtonR, INPUT);
+  
+  digitalWrite(dirPin, HIGH);
+}
+
+
+unsigned long tijdslimiet = 6000; //6 seconden
+unsigned long grijpTijd;
+unsigned long losTijd;
+bool overtime = 0;
+
+void foutmelding() {
+  while(digitalRead(Button) == false){
+    digitalWrite(LedRood, HIGH);
+    delay(100);
+    digitalWrite(LedRood, LOW);
+    delay(100);
+  }
+  
+  while(digitalRead(ButtonL) == false){
+    digitalWrite(LedRood, HIGH);
+    digitalWrite(dirPin, HIGH);  
+    digitalWrite(stepPin, HIGH);
+    delayMicroseconds(1000);      //resetsnelheid
+    digitalWrite(stepPin, LOW);
+    delayMicroseconds(1000);      //resetsnelheid 
+    digitalWrite(LedRood, LOW);
+  }         
+  digitalWrite(LedRood, LOW);
+}
+
+void loop(){
+  digitalWrite(LedGroen, HIGH);
+  delay(50);
+  overtime = 0;
+  
+  if(digitalRead(Button) == true){  
+    digitalWrite(LedGroen, LOW);
+    delay(50);
+    digitalWrite(LedRood, HIGH);
+    delay(50);
+
+    grijpTijd = millis(); 
+
+    //onkruid grijpen 
+    while(digitalRead(ButtonR) == false){
+      digitalWrite(dirPin, LOW);  
+      digitalWrite(stepPin, HIGH);
+      delayMicroseconds(600);       //snelheid in te stellen
+      digitalWrite(stepPin, LOW);
+      delayMicroseconds(600);       //snelheid in te stellen
+      if (millis() - grijpTijd > tijdslimiet) {
+        foutmelding();
+        overtime = 1;
+        break;        
+      } 
+    }
+    
+    //tegendruk geven
+    if(overtime == 0){
+      for(int i = 0; i < 200; i++){ 
+        digitalWrite(dirPin, LOW);  
+        digitalWrite(stepPin, HIGH);
+        delayMicroseconds(10000);   //aanpassen naar beweegtijd
+        digitalWrite(stepPin, LOW);
+        delayMicroseconds(10000);   //aanpassen naar beweegtijd                 
+      } 
+
+      losTijd = millis();
+      
+      //onkruid loslaten
+      while(digitalRead(ButtonL) == false) {
+        digitalWrite(dirPin, HIGH);  
+        digitalWrite(stepPin, HIGH);
+        delayMicroseconds(600);     //snelheid in te stellen
+        digitalWrite(stepPin, LOW);
+        delayMicroseconds(600);     //snelheid in te stellen
+        if (millis() - losTijd > tijdslimiet) {
+          foutmelding();
+          overtime = 1;
+          break;
+          
+        }
+      }
+    }
+    digitalWrite(LedRood, LOW);
+    delay(100);    
+  }
+  else{
+      digitalWrite(LedRood, LOW);
+  }
+}
+
+
